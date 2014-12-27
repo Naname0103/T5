@@ -42,6 +42,7 @@ protected:
     vector< vector<double> > D;
     vector<Tour> tours;
     Tour solution;
+    double min_L;
 
 
 public:
@@ -54,9 +55,11 @@ public:
         this->D = D;
         this->N = D.size();
         this->solution = NN();
-        min_L = calc_L(this->solution);
+        this->min_L = calc_L(this->solution);
         
     }
+
+
 
 
 
@@ -75,7 +78,7 @@ public:
             double min = 999999;
             int next = 0;
             for(int j = 0; j < index.size(); ++j){
-                double d = this->D[ data.at(i) ][index.at(j)];
+                double d = this->D[ t.tour.at(i) ][index.at(j)];
                 if(min > d){
                     min = d;
                     next = j;
@@ -86,20 +89,24 @@ public:
             index.erase(index.begin() + next);
             ++i;
         }
-        return data;
+        return t;
     }
 
-    double apply_2opt(Tout &tour){
+
+
+
+
+    double apply_2opt(Tour &tour){
         while(true){
             int min_j, min_k;
                 double diff = 0;
-                for(int j = 0; j < tour.size()-1; ++j){
-                    for(int k = j+2; k < tour.size(); ++k){
+                for(int j = 0; j < tour.tour.size()-1; ++j){
+                    for(int k = j+2; k < tour.tour.size(); ++k){
 
                         double d1 = this->D[ tour.tour.at(j)  ][ tour.tour.at(j+1) ] + this->D[ tour.tour.at(k)  ][ tour.tour.at( (k+1)%tour.tour.size()) ];
                         double d2 = this->D[ tour.tour.at(j)  ][ tour.tour.at(k) ] + this->D[ tour.tour.at(j+1)  ][ tour.tour.at( (k+1)%tour.tour.size()) ];
     
-                        if(d1 > d2){tour.
+                        if(d1 > d2){
                             double tmp_diff =d1 - d2;
                             if(diff < tmp_diff){
                                 min_j = j;
