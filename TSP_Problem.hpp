@@ -90,6 +90,20 @@ public:
 };
 
 
+
+
+struct Tour{
+
+    vector<int> tour;
+    double L;
+
+    bool operator<(const Tour &right) const{
+        return L < right.L;
+    }
+};
+
+
+
 class TSP_Problem{
 
 private:
@@ -115,6 +129,7 @@ public:
         if(!ifs)
             return false;
         string tag("");
+
 
 
         while(ifs >> tag && tag != "NODE_COORD_SECTION"){
@@ -176,7 +191,8 @@ public:
     }
 
 
-    void out_Tour(vector<int> tour){
+    void out_Tour(Tour t){
+        vector<int> tour = t.tour;
         string file_name = (ExtractPathWithoutExt(this->file_name)+".opt.tour");
 
         ofstream ofs( file_name.c_str() );

@@ -27,11 +27,6 @@ int randint(int min, int max){
 }
 
 
-struct Tour{
-
-    vector<int> tour;
-    double L;
-};
 
 
 
@@ -65,12 +60,14 @@ public:
 
     Tour NN(int start = 0){
         vector<int> index;
+        index.clear();
         Tour t;
         int i = 0;
         for(i = 0;i < this->N; ++i)
             index.push_back(i);
         t.tour.clear();
         t.tour.push_back( start);
+
         index.erase(index.begin() + start);
 
         i = 0;
@@ -117,14 +114,13 @@ public:
 
                         }
 
-
     
                     }
                 }
-    
                 if(diff > 0){
                     reverse(tour.tour.begin()+min_j+1, tour.tour.begin()+min_k+1);
                     // print_Data();
+
                 }
                 else
                     break;
@@ -160,6 +156,7 @@ public:
     void print_Soltion(){
 
 
+
         cout << this->min_L << "\n";
         cout << this->solution.tour.at(0);
         cout << ","<< this->solution.tour.at(1);
@@ -185,6 +182,10 @@ public:
 
         cout << "\n";
 
+    }
+
+    vector<Tour> get_Tours(){
+        return this->tours;
     }
 
 

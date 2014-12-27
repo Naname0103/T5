@@ -24,32 +24,27 @@ public:
 
     virtual void solve(){
 
-        this->Ls.clear();
         this->tours.clear();
         for(int i = 0; i < this->N; ++i){
-            vector<int> tour = this->NN(i);
-            apply_2opt(tour);
-            double L = calc_L(tour);
-            if(this->min_L > L){
-                this->min_L = L;
-                this->solution = tour;
-            }
-            this->Ls.push_back(L);
+            Tour tour = this->NN(i);
+            
+            double L = apply_2opt(tour);
+            this->tours.push_back(tour);
         }
 
-        sort(this->Ls.begin(), this->Ls.end());
+        sort(this->tours.begin(), this->tours.end());
 
         double sum = 0;
         double s_sum = 0;
-        int n = this->Ls.size();
+        int n = this->tours.size();
         for(int i = 0; i < n; ++i){
-            sum += this->Ls.at(i);
-            s_sum += this->Ls.at(i)*this->Ls.at(i);
+            sum += this->tours.at(i).L;
+            s_sum += this->tours.at(i).L*this->tours.at(i).L;
         }
         double ave = sum/n;
         double std_dev = sqrt(s_sum/n - ave*ave);
 
-        cout << "min:" << this->Ls.at(0) << " max:" << this->Ls.at(n-1) << " ave:" << ave << " std_dev:" << std_dev << "\n";
+        cout << "min:" << this->tours.at(0).L << " max:" << this->tours.at(n-1).L << " ave:" << ave << " std_dev:" << std_dev << "\n";
     }
 
 };
