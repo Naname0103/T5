@@ -30,20 +30,19 @@ int main(){
         ss << "benchmark_problem\\" << filename.at(i).c_str() << ".tsp";
         cout << ss.str() << "\n";
         TSP_Problem p(ss.str());
-
         Solver_2opt solver(p.get_D());
+        
         solver.solve();
-
 
         ss.str("");
         ss.clear(stringstream::goodbit);
         ss << filename.at(i).c_str() << ".csv";
         ofstream ofs(ss.str().c_str());
 
-        vector<double> Ls = solver.get_Ls();
-        ofs << Ls.at(0);
-        for(int j = 1; j < Ls.size(); ++j)
-            ofs << "," << Ls.at(j);
+        vector<Tour> ts = solver.get_Tours();
+        ofs << ts.at(0).L;
+        for(int j = 1; j < ts.size(); ++j)
+            ofs << "," << ts.at(j).L;
 
         p.out_Tour(solver.get_Solution());
     }
