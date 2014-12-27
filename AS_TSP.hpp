@@ -92,25 +92,12 @@ public:
         }
     }
 
-    int select_City(int location, vector<int> index){
-        double p_sum = 0;
-        for(int i = 0; i < index.size(); ++i)
-            p_sum += this->P[location][index.at(i)];
-
-        double r = randdouble();
-        double tmp = 0;
-        for(int i = 0; i < index.size(); ++i){
-            if(tmp < r && r <= tmp+this->P[location][index.at(i)]/p_sum )
-                return index.at(i);
-            tmp += tmp+this->P[location][index.at(i)]/p_sum;
-        }
-
-        return 0;
-    }
+    
 
     virtual void update(){
         int t = 0;
         while(t < this->steps){
+            this->Ls.clear();
             tours.clear();
             for(int i = 0; i < this->M; ++i){
                 int start = 0;
@@ -142,6 +129,22 @@ public:
 
 
         return 
+    }
+
+    int select_City(int location, vector<int> index){
+        double p_sum = 0;
+        for(int i = 0; i < index.size(); ++i)
+            p_sum += this->P[location][index.at(i)];
+
+        double r = randdouble();
+        double tmp = 0;
+        for(int i = 0; i < index.size(); ++i){
+            if(tmp < r && r <= tmp+this->P[location][index.at(i)]/p_sum )
+                return index.at(i);
+            tmp += tmp+this->P[location][index.at(i)]/p_sum;
+        }
+
+        return 0;
     }
 
 

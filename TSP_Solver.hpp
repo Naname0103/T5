@@ -89,17 +89,17 @@ public:
         return data;
     }
 
-    double apply_2opt(vector<int> &tour){
+    double apply_2opt(Tout &tour){
         while(true){
             int min_j, min_k;
                 double diff = 0;
                 for(int j = 0; j < tour.size()-1; ++j){
                     for(int k = j+2; k < tour.size(); ++k){
 
-                        double d1 = this->D[ tour.at(j)  ][ tour.at(j+1) ] + this->D[ tour.at(k)  ][ tour.at( (k+1)%tour.size()) ];
-                        double d2 = this->D[ tour.at(j)  ][ tour.at(k) ] + this->D[ tour.at(j+1)  ][ tour.at( (k+1)%tour.size()) ];
+                        double d1 = this->D[ tour.tour.at(j)  ][ tour.tour.at(j+1) ] + this->D[ tour.tour.at(k)  ][ tour.tour.at( (k+1)%tour.tour.size()) ];
+                        double d2 = this->D[ tour.tour.at(j)  ][ tour.tour.at(k) ] + this->D[ tour.tour.at(j+1)  ][ tour.tour.at( (k+1)%tour.tour.size()) ];
     
-                        if(d1 > d2){
+                        if(d1 > d2){tour.
                             double tmp_diff =d1 - d2;
                             if(diff < tmp_diff){
                                 min_j = j;
@@ -116,7 +116,7 @@ public:
                 }
     
                 if(diff > 0){
-                    reverse(tour.begin()+min_j+1, tour.begin()+min_k+1);
+                    reverse(tour.tour.begin()+min_j+1, tour.tour.begin()+min_k+1);
                     // print_Data();
                 }
                 else
