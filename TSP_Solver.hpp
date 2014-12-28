@@ -67,6 +67,7 @@ public:
             index.push_back(i);
         t.tour.clear();
         t.tour.push_back( start);
+        t.L = 0;
 
         index.erase(index.begin() + start);
 
@@ -81,11 +82,15 @@ public:
                     next = j;
                 }
             }
+            t.L += min;
 
             t.tour.push_back( index.at(next) );
             index.erase(index.begin() + next);
             ++i;
         }
+
+        t.L += this->D[t.tour.at(this->N-1)][start];
+
         return t;
     }
 

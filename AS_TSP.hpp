@@ -49,6 +49,7 @@ private:
     int M;
     vector< vector<double> > T;
     vector< vector<double> > P;
+    vector< vector<double> > ants_P;
 
     int steps;
     vector<int> init_index;
@@ -64,6 +65,8 @@ public:
         set_Tau0();
         this->T.assign(this->N, vector<double>(this->N, this->tau0));
         this->P.assign(this->N, vector<double>(this->N, 0));
+        this->ants_P.assign(this->N, vector<double>(this->N, 0));
+
         set_P();
 
         for(int i = 0; i < this->N; ++i)
@@ -74,8 +77,8 @@ public:
         double t = 0;
         for(int i = 0; i < this->N; ++i){
 
-            NN(i);
-            t += set_L();
+            ;
+            t += NN(i).L;
 
 
         }
@@ -97,38 +100,63 @@ public:
     virtual void update(){
         int t = 0;
         while(t < this->steps){
-            this->Ls.clear();
-            tours.clear();
+            this->tours.clear();
+            this->ants_P.assign(this->N, vector<double>(this->N, 0));
             for(int i = 0; i < this->M; ++i){
                 int start = 0;
-                vector<int> tmp = generate_Tour(start);
-
+                Tour tmp = generate_Tour(start);
+                add_Pheromone(tmp);
                 tours.push_back(tmp);
             }
+
+            update_Pheromone();
+
             ++t;
         }
 
 
     }
 
-
-    vector<int> generate_Tour(int start){
-        vector<int> tmp;
-        vector<int> index = this->init_index;
-
-        tmp.push_back(start);
-        index.erase(index.begin()+start);
-
-        while(!index.empty()){
+    void update_Pheromone(){
 
 
+        for(int i = 0; i < this->N; ++i)
+            for(int j = 0; j < this->N; ++j)
+                this->P[i][j] = (1-this->rho)*this->P[i][j] + this->ants_P[i][j];
 
+    }
 
+    void add_Pheromone( Tour t){
+
+        for(int i = 0; i < this->N; ++i){
+            this->ants_P[t.tour.at(i)][t.tour.at( (i+1)%this->N)] += 1/t.L;  
         }
 
+    }
 
 
-        return 
+    Tour generate_Tour(int start){
+        Tour tmp;
+        vector<int> index = this->init_index;
+        tmp.L = 0;
+        tmp.tour.push_back(start);
+        index.erase(index.begin()+start);
+
+        int i = start;
+        while(!index.empty()){
+            int j = select_City( i, index);
+
+            tmp.L += this->D[i][j];
+            tmp.tour.push_back(j);
+            index.erase(index.begin() + j);
+
+            i = j;
+
+        }
+        tmp.L += this->D[i][start];
+
+
+        return tmp;
     }
 
     int select_City(int location, vector<int> index){
@@ -148,4 +176,4 @@ public:
     }
 
 
-}s
+};
