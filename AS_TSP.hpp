@@ -49,87 +49,92 @@ private:
     int M;
     vector< vector<double> > T;
     vector< vector<double> > P;
-    vector< vector<double> > ants_P;
+    vector< vector<double> > ants_T;
 
     int steps;
     vector<int> init_index;
 
 
 public:
-    Solver_AS( vector< vector<double> > D, int steps, double alpha = 1, double beta = 2, double rho = 0.5):TSP_Solver(D){
+    Solver_AS( vector< vector<double> > D, int steps = 1000, double alpha = 1, double beta = 2, double rho = 0.5):TSP_Solver(D){
         this->alpha = alpha;
         this->beta = beta;
-        this->M = this->N;
+        this->M = 100;//this->N;
         this->rho = rho;
         this->steps = steps;
         set_Tau0();
+  
         this->T.assign(this->N, vector<double>(this->N, this->tau0));
         this->P.assign(this->N, vector<double>(this->N, 0));
-        this->ants_P.assign(this->N, vector<double>(this->N, 0));
+        this->ants_T.assign(this->N, vector<double>(this->N, 0));
 
         set_P();
 
         for(int i = 0; i < this->N; ++i)
-            init_index.push_back(i);
+            this->init_index.push_back(i);
     }
 
     void set_Tau0(){
         double t = 0;
         for(int i = 0; i < this->N; ++i){
-
-            ;
             t += NN(i).L;
-
-
         }
         t/=(double)this->N;
-        this->tau0 = this->M/t;
+        this->tau0 = (double)this->M/t;
     }
+
 
 
     void set_P(){
         for(int i = 0; i < this->N; ++i){
             for(int j = 0; j < this->N; ++j){
-                this->P[i][j] = pow(this->T[i][j], alpha)*pow(1/this->D[i][j], beta);
+                this->P[i][j] = pow(this->T[i][j], alpha)*pow(1.0/this->D[i][j], beta);
             }
         }
     }
 
-    
 
-    virtual void update(){
+    virtual void solve(){
         int t = 0;
         while(t < this->steps){
             this->tours.clear();
-            this->ants_P.assign(this->N, vector<double>(this->N, 0));
+            this->ants_T.assign(this->N, vector<double>(this->N, 0));
             for(int i = 0; i < this->M; ++i){
-                int start = 0;
+                int start = i%this->N;
                 Tour tmp = generate_Tour(start);
-                add_Pheromone(tmp);
-                tours.push_back(tmp);
+                add_Tau(tmp);
+                this->tours.push_back(tmp);
             }
 
-            update_Pheromone();
+            update_Tau();
+            set_P();
+            sort(this->tours.begin(), this->tours.end());
+            if(this->solution.L > this->tours.at(0).L){
+                this->solution = this->tours.at(0);
+                t = 0;
+            }else{
+                ++t;
+            }
 
-            ++t;
+
+            cout << this->tours.at(0).L << "\n";
         }
-
 
     }
 
-    void update_Pheromone(){
+    void update_Tau(){
 
 
         for(int i = 0; i < this->N; ++i)
             for(int j = 0; j < this->N; ++j)
-                this->P[i][j] = (1-this->rho)*this->P[i][j] + this->ants_P[i][j];
+                this->T[i][j] = (1-this->rho)*this->T[i][j] + this->ants_T[i][j];
 
     }
 
-    void add_Pheromone( Tour t){
+    void add_Tau( Tour t){
 
         for(int i = 0; i < this->N; ++i){
-            this->ants_P[t.tour.at(i)][t.tour.at( (i+1)%this->N)] += 1/t.L;  
+            this->ants_T[t.tour.at(i)][t.tour.at( (i+1)%this->N)] += 1.0/(double)t.L;  
         }
 
     }
@@ -141,35 +146,34 @@ public:
         tmp.L = 0;
         tmp.tour.push_back(start);
         index.erase(index.begin()+start);
-
-        int i = start;
+        int prv = start;
         while(!index.empty()){
-            int j = select_City( i, index);
+            int selected = select_City( prv, index);
+            int nxt = index.at(selected);
+            tmp.L += (int)(this->D[prv][nxt] + 0.5);
+            tmp.tour.push_back(nxt);
+            index.erase(index.begin() + selected);
 
-            tmp.L += this->D[i][j];
-            tmp.tour.push_back(j);
-            index.erase(index.begin() + j);
-
-            i = j;
+            prv = nxt;
 
         }
-        tmp.L += this->D[i][start];
+        tmp.L += (int)(this->D[prv][start] + 0.5);
 
 
         return tmp;
     }
 
-    int select_City(int location, vector<int> index){
+    int select_City(int prv, vector<int> index){
         double p_sum = 0;
         for(int i = 0; i < index.size(); ++i)
-            p_sum += this->P[location][index.at(i)];
+            p_sum += this->P[prv][index.at(i)];
 
         double r = randdouble();
         double tmp = 0;
         for(int i = 0; i < index.size(); ++i){
-            if(tmp < r && r <= tmp+this->P[location][index.at(i)]/p_sum )
-                return index.at(i);
-            tmp += tmp+this->P[location][index.at(i)]/p_sum;
+            if(tmp < r && r <= tmp+this->P[prv][index.at(i)]/p_sum )
+                return i;
+            tmp += this->P[prv][index.at(i)]/p_sum;
         }
 
         return 0;

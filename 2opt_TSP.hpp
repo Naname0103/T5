@@ -45,6 +45,7 @@ public:
         double std_dev = sqrt(s_sum/n - ave*ave);
 
         cout << "min:" << this->tours.at(0).L << " max:" << this->tours.at(n-1).L << " ave:" << ave << " std_dev:" << std_dev << "\n";
+        this->solution = this->tours.at(0);
     }
 
 };

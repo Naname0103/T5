@@ -82,14 +82,14 @@ public:
                     next = j;
                 }
             }
-            t.L += min;
+            t.L += (int)(min + 0.5);
 
             t.tour.push_back( index.at(next) );
             index.erase(index.begin() + next);
             ++i;
         }
 
-        t.L += this->D[t.tour.at(this->N-1)][start];
+        t.L += (int)(this->D[t.tour.at(this->N-1)][start] + 0.5);
 
         return t;
     }
