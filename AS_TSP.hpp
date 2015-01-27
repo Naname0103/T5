@@ -15,33 +15,9 @@ using namespace std;
 
 #pragma once
 
-// class Ant{
-// private:
-//     int location;
-//     double pheromone;
-//     vector<int> tour;
-
-// public:
-//     Ant(int location){
-//         this->location = location;
-//         this->pheromone = 0;
-//     }
-
-
-//     void set_Tour( vector< vector<double> > D, vector< vector<double> > T){
-
-
-
-//     }
-
-
-
-// };
-
-
 
 class Solver_AS : public TSP_Solver{
-private:
+protected:
     double alpha;
     double beta;
     double rho;
@@ -59,12 +35,11 @@ public:
     Solver_AS( vector< vector<double> > D, int steps = 1000, double alpha = 1, double beta = 2, double rho = 0.5):TSP_Solver(D){
         this->alpha = alpha;
         this->beta = beta;
-        this->M = 100;//this->N;
+        this->M = this->N;
         this->rho = rho;
         this->steps = steps;
         set_Tau0();
   
-        this->T.assign(this->N, vector<double>(this->N, this->tau0));
         this->P.assign(this->N, vector<double>(this->N, 0));
         this->ants_T.assign(this->N, vector<double>(this->N, 0));
 
@@ -74,13 +49,19 @@ public:
             this->init_index.push_back(i);
     }
 
-    void set_Tau0(){
+    double calc_Lnn(){
         double t = 0;
         for(int i = 0; i < this->N; ++i){
             t += NN(i).L;
         }
         t/=(double)this->N;
-        this->tau0 = (double)this->M/t;
+        return t;
+    }
+
+    void set_Tau0(){
+        this->tau0 = (double)this->M/(calc_Lnn());
+        this->T.assign(this->N, vector<double>(this->N, this->tau0));
+
     }
 
 
@@ -105,10 +86,9 @@ public:
                 add_Tau(tmp);
                 this->tours.push_back(tmp);
             }
-
+            sort(this->tours.begin(), this->tours.end());
             update_Tau();
             set_P();
-            sort(this->tours.begin(), this->tours.end());
             if(this->solution.L > this->tours.at(0).L){
                 this->solution = this->tours.at(0);
                 t = 0;
@@ -116,8 +96,7 @@ public:
                 ++t;
             }
 
-
-            cout << this->tours.at(0).L << "\n";
+            this->best_tours.push_back(this->solution);
         }
 
     }

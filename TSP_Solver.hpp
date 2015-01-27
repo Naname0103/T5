@@ -36,6 +36,7 @@ protected:
     int N;
     vector< vector<double> > D;
     vector<Tour> tours;
+    vector<Tour> best_tours;   
     Tour solution;
     double min_L;
 
@@ -191,6 +192,10 @@ public:
 
     vector<Tour> get_Tours(){
         return this->tours;
+    }
+
+    vector<Tour> get_Best_Tours(){
+        return this->best_tours;
     }
 
 
